@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" charset=euc-kr">
+        <title>Kakao searching</title>
+        <link rel="stylesheet" href="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+        <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
+    </head>
+    <body>
+        <!---정보페이지-->
+        <div data-role="page" id="subSection">
+            <div data-role="header" data-theme="b" data-position="fixed">
+                <a href="index.html" target="_self" data-icon="home" data-iconpos="notext"></a>
+                
+                <h2>Info</h2>
+                <a href="#mainList" data-icon="back" data-iconpos="notext"></a>
+            </div>
+            <div data-role="content">
+                <div style="text-align: center;margin: auto;"><img src="" id="image"></div>
+                <h5 id="bookTitle" style="text-align: center;"></h5>
+                <h5 id="bookAuthors" style="text-align: center;"></h5>
+                <p id="bookContents" style="text-align: center;"></p>
+            </div>
+            <div data-role="footer" data-theme="b" data-position="fixed">
+                <h2>copyright@김 정 훈</h2>
+            </div>
+        </div>
+    </body>
+    <script>
+        getList();
+        var size=10;
+        $("#btnMore").on("click",function(){
+            size+=5;
+            getList();
+        });
+        $("#txtQuery").on("keydown",function(){
+            size=10;
+            getList();
+        });
+        $("#list").on("click", "a", function(){
+            var title=$(this).attr("title");
+            var authors=$(this).attr("authors");
+            var contents=$(this).attr("contents");
+            var price=$(this).attr("price");
+            var image=$(this).find("img").attr("src");
+            $("#image").attr("src", image);
+            $("#bookTitle").html(title);
+            $("#bookAuthors").html(authors+"(\ "+price+"원)");
+            $("#bookContents").html(contents);
+        });
+        function getList(){
+            var query=$("#txtQuery").val();
+            $.ajax({
+                type:"get",
+                url:"https://dapi.kakao.com/v3/search/book?target=title",
+                dataType:"json",
+                data:{"query":query,"size":size},
+                headers:{"Authorization": "KakaoAK 7664a8fc3b23483f1546a7cca6bbca6a"},
+                success:function(data) {
+                    var temp=Handlebars.compile($("#temp").html());
+                    $("#list").html(temp(data)).listview("refresh");
+                }
+            });
+        }
+    </script>
+</html>
